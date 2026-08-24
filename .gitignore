@@ -1,0 +1,26 @@
+# Python artifacts
+__pycache__/
+*.py[cod]
+*$py.class
+.DS_Store
+
+# Environments
+.env
+.venv
+env/
+venv/
+
+# Manuscript drafts (not part of code release)
+*.pdf
+*.docx
+*.pptx
+
+# Heavy model weights & archives (exceed GitHub 100 MB limit; host on Zenodo / GitHub Releases)
+checkpoints/*.pt
+checkpoints/*.pth
+*.zip
+*.tar.gz
+
+# IDE
+.vscode/
+.idea/

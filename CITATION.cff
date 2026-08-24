@@ -1,0 +1,19 @@
+cff-version: 1.2.0
+message: "If you use this software or dataset in your research, please cite our manuscript."
+title: "Beyond Weed Coverage: Component-Balanced Learning Improves Fragmented Late-Season UAV Weed Segmentation"
+type: software
+license: MIT
+repository-code: "https://github.com/Ygzao/late-season-weed-segmentation"
+authors:
+  - family-names: "Ygzao"
+    given-names: "David"
+    affiliation: "The Hebrew University of Jerusalem & ARO Volcani Institute, Israel"
+  - family-names: "Blank"
+    given-names: "Lior"
+    affiliation: "ARO Volcani Institute, Israel"
+  - family-names: "Eizenberg"
+    given-names: "Hanan"
+    affiliation: "ARO Volcani Institute, Israel"
+  - family-names: "Mesgaran"
+    given-names: "Mohsen B."
+    affiliation: "University of California, Davis, USA"
