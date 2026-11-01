@@ -630,7 +630,7 @@ def generate_figA1(data_dir: Path, output_dir: Path):
 
     axes[0].plot(epochs, df["train_loss"], color=c_tr, lw=2, label="Training")
     axes[0].plot(epochs, df["val_loss"], color=c_val, lw=2, label="Validation")
-    axes[0].axvline(35, color="#777777", ls="--", alpha=0.7)
+    axes[0].axvline(35, color="#777777", ls="--", alpha=0.7, label="Selected checkpoint")
     axes[0].text(0.03, 0.93, "A", transform=axes[0].transAxes, fontsize=14, fontweight="bold", va="top")
     axes[0].set_xlabel("Epoch"); axes[0].set_ylabel("Focal-Tversky Loss ($\\mathcal{L}_{\\mathrm{FT}}$)")
     axes[0].set_xlim(0, 46); axes[0].set_ylim(0.25, 0.82)
