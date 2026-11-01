@@ -615,63 +615,43 @@ def generate_fig7(images_dir: Optional[str], masks_dir: Optional[str], checkpoin
 # =========================================================================
 # FIGURE S1 (figA1): TRAINING DYNAMICS AND CONVERGENCE ANALYSIS
 # =========================================================================
-def generate_figA1(output_dir: Path):
-    epochs = np.arange(1, 46)
-    np.random.seed(42)
+def generate_figA1(data_dir: Path, output_dir: Path):
+    log_path = data_dir / "table_training_dynamics_log.csv"
+    if not log_path.exists():
+        print(f"Skipping Figure S1: {log_path} not found.")
+        return
 
-    train_miou = 0.83124381 - 0.74045354 * np.exp(-epochs / 11.99992722) + np.random.normal(0, 0.003, 45)
-    val_miou = 0.88546375 - 0.82814943 * np.exp(-epochs / 11.9993120) - 0.0035331099 * epochs + np.random.normal(0, 0.002, 45)
-
-    train_dice = 0.90886751 - 0.75547706 * np.exp(-epochs / 10.83389681) + np.random.normal(0, 0.003, 45)
-    val_dice = 0.98850237 - 0.87533397 * np.exp(-epochs / 11.9963817) - 0.0031764507 * epochs + np.random.normal(0, 0.002, 45)
-
-    train_loss = 0.27437713 + 0.56006734 * np.exp(-epochs / 9.77828037) + np.random.normal(0, 0.004, 45)
-    val_loss = 0.25770781 + 0.58800291 * np.exp(-epochs / 12.0011386) + 0.0012990398 * epochs + np.random.normal(0, 0.003, 45)
-
-    train_miou[34] = 0.791; train_miou[44] = 0.814
-    val_miou[34] = 0.717; val_miou[44] = 0.707
-    train_dice[34] = 0.879; train_dice[44] = 0.897
-    val_dice[34] = 0.830; val_dice[44] = 0.825
-    train_loss[34] = 0.290; train_loss[44] = 0.280
-    val_loss[34] = 0.335; val_loss[44] = 0.330
-
-    for i in range(45):
-        if i != 34:
-            if val_miou[i] >= 0.717:
-                val_miou[i] = 0.717 - 0.001 - np.random.uniform(0.0, 0.002)
-            if val_dice[i] >= 0.830:
-                val_dice[i] = 0.830 - 0.001 - np.random.uniform(0.0, 0.002)
-            if val_loss[i] <= 0.335:
-                val_loss[i] = 0.335 + 0.001 + np.random.uniform(0.0, 0.002)
+    df = pd.read_csv(log_path)
+    epochs = df["epoch"].values
 
     plt.rcParams["font.family"] = "DejaVu Sans"
     fig, axes = plt.subplots(1, 3, figsize=(15, 4.2), dpi=300)
     c_tr, c_val = "#1f77b4", "#ff7f0e"
 
-    axes[0].plot(epochs, train_loss, color=c_tr, lw=2, label="Training Loss")
-    axes[0].plot(epochs, val_loss, color=c_val, lw=2, label="Validation Loss")
-    axes[0].axvline(35, color="#777777", ls="--", alpha=0.7, label="Best Val checkpoint (35)")
+    axes[0].plot(epochs, df["train_loss"], color=c_tr, lw=2, label="Training")
+    axes[0].plot(epochs, df["val_loss"], color=c_val, lw=2, label="Validation")
+    axes[0].axvline(35, color="#777777", ls="--", alpha=0.7)
     axes[0].text(0.03, 0.93, "A", transform=axes[0].transAxes, fontsize=14, fontweight="bold", va="top")
-    axes[0].set_xlabel("Epoch"); axes[0].set_ylabel("Loss (BCE + Dice)")
-    axes[0].set_xlim(0, 46); axes[0].set_ylim(0.20, 0.85)
-    axes[0].grid(True, ls="--", alpha=0.4); axes[0].legend(loc="upper right", frameon=True)
+    axes[0].set_xlabel("Epoch"); axes[0].set_ylabel("Focal-Tversky Loss ($\\mathcal{L}_{\\mathrm{FT}}$)")
+    axes[0].set_xlim(0, 46); axes[0].set_ylim(0.25, 0.82)
+    axes[0].grid(True, ls="--", alpha=0.4)
+    axes[0].legend(loc="lower left", frameon=True)
 
-    axes[1].plot(epochs, train_dice, color=c_tr, lw=2, label="Training Dice")
-    axes[1].plot(epochs, val_dice, color=c_val, lw=2, label="Validation Dice")
+    axes[1].plot(epochs, df["train_dice"], color=c_tr, lw=2)
+    axes[1].plot(epochs, df["val_dice"], color=c_val, lw=2)
     axes[1].axvline(35, color="#777777", ls="--", alpha=0.7)
     axes[1].text(0.03, 0.93, "B", transform=axes[1].transAxes, fontsize=14, fontweight="bold", va="top")
-    axes[1].set_xlabel("Epoch"); axes[1].set_ylabel("Dice Coefficient")
-    axes[1].set_xlim(0, 46); axes[1].set_ylim(0.10, 0.95)
-    axes[1].grid(True, ls="--", alpha=0.4); axes[1].legend(loc="lower right", frameon=True)
+    axes[1].set_xlabel("Epoch"); axes[1].set_ylabel("Foreground Dice Coefficient")
+    axes[1].set_xlim(0, 46); axes[1].set_ylim(0.0, 0.95)
+    axes[1].grid(True, ls="--", alpha=0.4)
 
-    axes[2].plot(epochs, train_miou, color=c_tr, lw=2, label="Training mIoU")
-    axes[2].plot(epochs, val_miou, color=c_val, lw=2, label="Validation mIoU")
+    axes[2].plot(epochs, df["train_miou"], color=c_tr, lw=2)
+    axes[2].plot(epochs, df["val_miou"], color=c_val, lw=2)
     axes[2].axvline(35, color="#777777", ls="--", alpha=0.7)
-    axes[2].text(36, 0.35, "Best Val mIoU @ 35", color="#333333", rotation=90, va="center", fontsize=9)
     axes[2].text(0.03, 0.93, "C", transform=axes[2].transAxes, fontsize=14, fontweight="bold", va="top")
-    axes[2].set_xlabel("Epoch"); axes[2].set_ylabel("Mean IoU (mIoU)")
-    axes[2].set_xlim(0, 46); axes[2].set_ylim(0.05, 0.88)
-    axes[2].grid(True, ls="--", alpha=0.4); axes[2].legend(loc="lower right", frameon=True)
+    axes[2].set_xlabel("Epoch"); axes[2].set_ylabel("Foreground Weed IoU ($\\mathrm{IoU}_{\\mathrm{Weed}}$)")
+    axes[2].set_xlim(0, 46); axes[2].set_ylim(0.0, 0.88)
+    axes[2].grid(True, ls="--", alpha=0.4)
 
     plt.tight_layout()
     out_path = output_dir / "figA1_training_dynamics.png"
@@ -700,7 +680,7 @@ def main():
     generate_fig5(data_dir, output_dir)
     generate_fig6(data_dir, output_dir)
     generate_fig7(args.images_dir, args.masks_dir, checkpoints_dir, output_dir)
-    generate_figA1(output_dir)
+    generate_figA1(data_dir, output_dir)
     print("\nAll requested figures processed successfully.")
 
 
